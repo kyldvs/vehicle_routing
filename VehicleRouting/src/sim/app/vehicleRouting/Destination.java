@@ -1,8 +1,11 @@
 package sim.app.vehicleRouting;
 
 import java.awt.Point;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Destination {
+	
 	private int xMin; 
 	private int xMax;
 	private int yMin;
@@ -46,5 +49,18 @@ public class Destination {
 
 	public void setAssigned(boolean assigned) {
 		this.assigned = assigned;
+	}
+
+	public Set<Point> points() {
+		Set<Point> boundary = new HashSet<>();
+		for (int i = xMin; i <= xMax; i++) {
+			boundary.add(new Point(i, yMin));
+			boundary.add(new Point(i, yMax));
+		}
+		for (int i = yMin; i <= yMax; i++) {
+			boundary.add(new Point(xMin, i));
+			boundary.add(new Point(xMax, i));
+		}
+		return boundary;
 	}
 }

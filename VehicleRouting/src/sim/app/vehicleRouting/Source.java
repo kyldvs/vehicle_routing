@@ -1,15 +1,17 @@
 package sim.app.vehicleRouting;
 
 import java.awt.Point;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Source {
+	
 	private int xMin; 
 	private int xMax;
 	private int yMin;
 	private int yMax;
+	
 	public Point point = new Point();
-	private boolean assigned = false;
-	private Vehicle assignedVehicle;
 	
 	public Source(int xMin, int xMax, int yMin, int yMax) {
 		this.xMax = xMax;
@@ -35,16 +37,17 @@ public class Source {
 	public int getyMax() {
 		return yMax;
 	}
-	
-	public Vehicle getAssignedVehicle() {
-		return this.assignedVehicle;
-	}
 
-	public boolean isAssigned() {
-		return assigned;
-	}
-
-	public void setAssigned(boolean assigned) {
-		this.assigned = assigned;
+	public Set<Point> points() {
+		Set<Point> boundary = new HashSet<>();
+		for (int i = xMin; i <= xMax; i++) {
+			boundary.add(new Point(i, yMin));
+			boundary.add(new Point(i, yMax));
+		}
+		for (int i = yMin; i <= yMax; i++) {
+			boundary.add(new Point(xMin, i));
+			boundary.add(new Point(xMax, i));
+		}
+		return boundary;
 	}
 }
