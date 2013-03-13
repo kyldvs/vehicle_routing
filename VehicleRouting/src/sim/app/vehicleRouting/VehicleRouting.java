@@ -18,7 +18,7 @@ public class VehicleRouting extends SimState
 {
 	public static final Random random = new Random();
 	
-	public final int GRID_HEIGHT 	= 100;
+	public final int GRID_HEIGHT 	= 110;
 	public final int GRID_WIDTH 	= 101;
 
 	public final int EMPTY_AREA			= 0;
@@ -51,7 +51,7 @@ public class VehicleRouting extends SimState
 		// read in data and create structures
 		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
 		for (int i = 0; i < numDestinations; i++) {
-			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
+			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, 94, 96));
 		}
 
 		for (int i = 0; i < numVehicles; i++) {
@@ -63,7 +63,7 @@ public class VehicleRouting extends SimState
 		{
 			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
 			{
-				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+				if (x % 2 == 0 && y >= 2 && y < 90) {
 					obstacles.field[x][y] = OBSTACLE_AREA;
 					sources.add(new Source(x, x, y, y));
 				}
@@ -93,12 +93,17 @@ public class VehicleRouting extends SimState
 		}
 
 		// initialize vehicle locations
-		int offset = 0;
+		int vx = 1;
+		int vy = 100;
 		for(Vehicle v : vehicles)
 		{
-			vehicleGrid.setObjectLocation(v, offset, 0);
+			vehicleGrid.setObjectLocation(v, vx, vy);
 			schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
-			offset++;
+			vx += 2;
+			if (vx >= GRID_WIDTH - 1) {
+				vy += 2;
+				vx = 1;
+			}
 		}
 
 	}
