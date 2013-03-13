@@ -48,19 +48,19 @@ public class VehicleRoutingWithUI extends GUIState{
     {
         VehicleRouting vr = (VehicleRouting)state;
 
-        sourcePortrayal.setField(vr.source);
+        sourcePortrayal.setField(vr.sourceGrid);
         sourcePortrayal.setMap(new sim.util.gui.SimpleColorMap(0,1,
                 													new Color(0,0,0,0),
                 													new Color(0,255,0,255)
         														)
         						);
-        destinationPortrayal.setField(vr.destination);
+        destinationPortrayal.setField(vr.destinationGrid);
         destinationPortrayal.setMap(new sim.util.gui.SimpleColorMap(0,1,
                 													new Color(0,0,0,0),
                 													new Color(255,0,0,255)
         														)
         						);
-        obstaclePortrayal.setField(vr.obstacles);
+        obstaclePortrayal.setField(vr.obstacleGrid);
         obstaclePortrayal.setMap(new sim.util.gui.SimpleColorMap(0,1,
                 													new Color(0,0,0,0),
                 													new Color(0,0,0,255) 

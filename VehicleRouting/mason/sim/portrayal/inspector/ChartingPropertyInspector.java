@@ -5,7 +5,7 @@
 */
 
 package sim.portrayal.inspector;
-import java.awt.*;
+import java.awt.*; 
 import java.awt.event.*;
 import sim.util.*;
 import sim.display.*;
