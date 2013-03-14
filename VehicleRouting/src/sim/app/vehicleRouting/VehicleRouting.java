@@ -19,6 +19,7 @@ import sim.util.Int2D;
 public class VehicleRouting extends SimState
 {
 	private HashMap<Vehicle, PriorityQueue<Job>> assignments = new HashMap<Vehicle, PriorityQueue<Job>>();
+	public Scheduler scheduler = new Greedy();
 	
 	public static final Random random = new Random();
 	
@@ -63,7 +64,7 @@ public class VehicleRouting extends SimState
 		initializeObstacles();
 		
 		initializeUnassignedJobs();
-		Scheduler.greedy(vehicles, unassignedJobs, assignments);
+		scheduler.run(vehicles, unassignedJobs, assignments);
 	}
 
 	private void initializeUnassignedJobs()
@@ -274,7 +275,7 @@ public class VehicleRouting extends SimState
 		updateUnassignedJobs();
 		if(!unassignedJobs.isEmpty())
 		{
-			Scheduler.greedy(vehicles, unassignedJobs, assignments);
+			scheduler.run(vehicles, unassignedJobs, assignments);
 		}
 		
 		if(assignments.get(v) == null)
