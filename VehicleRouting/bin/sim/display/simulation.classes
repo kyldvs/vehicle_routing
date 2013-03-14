@@ -13,7 +13,7 @@
 # with 'NAME:' (no quotes), # followed by some text, this
 # text will then be considered the "short name" of the
 # simulation to display in the pop-up simulation chooser.
-# The reason you would do this in addition to putting
+# The reason you would do this in addition to puttiing
 # the name in the getName() static method is because it
 # prevents MASON from needing to load your class files just
 # to find out what name to display -- if you do a lot of

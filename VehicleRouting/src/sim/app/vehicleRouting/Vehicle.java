@@ -15,44 +15,52 @@ import sim.util.Int2D;
 public class Vehicle extends OvalPortrayal2D implements Steppable
 {
 	public boolean hasItem = false;
+	
+	private Destination dest;
+	private Source src;
+	private Job job;
 
-	public Destination dest;
-	public Source src;
-
-	private Color noItemColor = Color.blue;
-	private Color itemColor = Color.red;
+	private Color noItemColor 	= Color.blue;
+	private Color itemColor 	= Color.red;
 
 	public void act( final SimState state )
 	{
 		final VehicleRouting vr = (VehicleRouting) state;
-
+		List<Point> path;
 		Int2D loc = vr.vehicleGrid.getObjectLocation(this);
-
-		if (hasItem) {
-			if (src == null) {
-				src = vr.getRandomSource();
-				dest = null;
-			} else {
-				List<Point> path = vr.bfs(loc.toPoint(), src.points());
-				if (path != null) {
+		
+		if(job == null)
+		{
+			setJob(vr.getJob(this));
+		}
+		else
+		{
+			if ( hasItem )
+			{				
+				dest = job.getDestination();
+				path = vr.getPath(loc.toPoint(), dest.points());
+				if (path != null)
+				{
 					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
-					if (path.size() == 1) {
+					if (path.size() == 1)
+					{
 						hasItem = false;
+						job = null;
 					}
 				}
 			}
-		} else {
-			if (dest == null) {
-				dest = vr.getRandomDestination();
-				src = null;
-			} else {
-				List<Point> path = vr.bfs(loc.toPoint(), dest.points());
-				if (path != null) {
+			else
+			{
+				src = job.getSource();
+				path = vr.getPath(loc.toPoint(), src.points());
+				if (path != null)
+				{
 					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
-					if (path.size() == 1) {
+					if (path.size() == 1)
+					{
 						hasItem = true;
 					}
-				}
+				}		
 			}
 		}
 	}
@@ -62,7 +70,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 		act(state);
 	}
 
-	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info)
+	public final void draw( Object object, Graphics2D graphics, DrawInfo2D info )
 	{
 		if( hasItem )
 		{
@@ -73,7 +81,6 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 			graphics.setColor( noItemColor );
 		}
 
-		// this code was stolen from OvalPortrayal2D
 		int x = (int)(info.draw.x - info.draw.width / 2.0);
 		int y = (int)(info.draw.y - info.draw.height / 2.0);
 		int width = (int)(info.draw.width);
@@ -90,5 +97,13 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 	public void setItem(boolean val)
 	{
 		hasItem = val;
+	}
+
+	public Job getJob() {
+		return job;
+	}
+
+	public void setJob(Job job) {
+		this.job = job;
 	}
 }

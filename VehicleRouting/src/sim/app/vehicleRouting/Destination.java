@@ -52,7 +52,7 @@ public class Destination {
 	}
 
 	public Set<Point> points() {
-		Set<Point> boundary = new HashSet<>();
+		Set<Point> boundary = new HashSet<Point>();
 		for (int i = xMin; i <= xMax; i++) {
 			boundary.add(new Point(i, yMin));
 			boundary.add(new Point(i, yMax));
