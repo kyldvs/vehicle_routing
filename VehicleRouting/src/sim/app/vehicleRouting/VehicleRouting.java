@@ -18,26 +18,30 @@ import sim.util.Int2D;
 @SuppressWarnings("serial")
 public class VehicleRouting extends SimState
 {
-	private HashMap<Vehicle, PriorityQueue<Job>> assignments = new HashMap<Vehicle, PriorityQueue<Job>>();
+	//############################################//
+	//############ CHANGABLE VARIABLES ############//
 	public Scheduler scheduler = new Greedy();
+		
+	public final int NUM_JOBS			= 1000;
+	public final double LAMBDA			= -0.04;
+	public final int CURVE_TIGHTNESS	= 40;
 	
+	public int numVehicles 				= 20;
+	public int numDestinations 			= 5;
+	//############################################//
+	//############################################//
+	
+	private HashMap<Vehicle, PriorityQueue<Job>> assignments = new HashMap<Vehicle, PriorityQueue<Job>>();
 	public static final Random random = new Random();
 	
-	public final int GRID_HEIGHT 	= 110;
-	public final int GRID_WIDTH 	= 101;
+	public final int GRID_HEIGHT 		= 110;
+	public final int GRID_WIDTH 		= 101;
 
 	public final int EMPTY_AREA			= 0;
 	public final int OBSTACLE_AREA		= 1;
 	public final int SOURCE_AREA 		= 1;
 	public final int DESTINATION_AREA 	= 2;
 	
-	public final int NUM_JOBS			= 1000;
-	public final double LAMBDA			= -0.04;
-	public final int CURVE_TIGHTNESS	= 40;	// 1 is extremely tight, 100 very wide
-
-	public int numVehicles 				= 20;
-	public int numDestinations 			= 5;
-
 	public IntGrid2D 	sourceGrid 		= new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
 	public IntGrid2D 	destinationGrid = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
 	public IntGrid2D 	obstacleGrid 	= new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);

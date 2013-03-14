@@ -10,10 +10,11 @@ public class Greedy implements Scheduler{
 	public void run(List<Vehicle> vehicles, List<Job> unassignedJobs, HashMap<Vehicle, PriorityQueue<Job>> assignments) {
 		if(unassignedJobs != null)
 		{				
-			int minWorkload = Integer.MAX_VALUE;
-			int currWorkload;
-			Vehicle minLoadedVehicle = vehicles.get(0);
 			PriorityQueue<Job> currJobs;
+			int currWorkload;
+
+			Vehicle minLoadedVehicle = vehicles.get(0);
+			int minWorkload = Integer.MAX_VALUE;
 			
 			for(Job j : unassignedJobs)
 			{
