@@ -16,6 +16,7 @@ import sim.app.packing.PackingAlgorithms;
 import sim.app.topo.TopoVariables;
 import sim.engine.Schedule;
 import sim.engine.SimState;
+import sim.engine.Stoppable;
 import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
@@ -30,6 +31,8 @@ public class VehicleRouting extends SimState
 	
 	private Map<Vehicle, List<Job>> assignments = new HashMap<Vehicle, List<Job>>();
 	public static final Random random = new Random();
+	
+	public int collisions = 0;
 	
 	public final int GRID_HEIGHT 		= 110;
 	public final int GRID_WIDTH 		= 101;
@@ -143,7 +146,8 @@ public class VehicleRouting extends SimState
 		for(Vehicle v : vehicles)
 		{
 			vehicleGrid.setObjectLocation(v, offset, 0);
-			schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
+			Stoppable stop = schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
+			v.setStoppable(stop);
 			offset++;
 		}		
 	}

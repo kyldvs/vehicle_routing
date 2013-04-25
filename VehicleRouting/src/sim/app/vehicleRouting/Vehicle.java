@@ -48,6 +48,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 				path = vr.findPath(loc.toPoint(), dest.adjacentFunction(), collision);
 				if (path == null) {
 					collision = true;
+					vr.collisions++;
 					path = vr.findPath(loc.toPoint(), dest.adjacentFunction(), collision);
 				}
 				
@@ -68,6 +69,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 				path = vr.findPath(loc.toPoint(), src.adjacentFunction(), collision);
 				if (path == null) {
 					collision = true;
+					vr.collisions++;
 					path = vr.findPath(loc.toPoint(), src.adjacentFunction(), collision);
 				}
 				
