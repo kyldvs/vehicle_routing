@@ -9,7 +9,7 @@ public class Packing<T> {
 	private List<Bin<T>> packing;
 	
 	public Packing() {
-		packing = new ArrayList<>();
+		packing = new ArrayList<Bin<T>>();
 	}
 	
 	public void add(Bin<T> bin) {

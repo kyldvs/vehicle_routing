@@ -26,7 +26,7 @@ public class VehicleRouting extends SimState
 {
 	//############################################//
 	//############ CHANGABLE VARIABLES ############//
-	public PackingAlgorithm<Job> scheduler = new FirstFit<>();
+	public PackingAlgorithm<Job> scheduler = new FirstFit<Job>();
 		
 	public final int NUM_JOBS			= 1000;
 	public final double LAMBDA			= -0.04;
