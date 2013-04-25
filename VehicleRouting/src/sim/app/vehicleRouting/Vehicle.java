@@ -15,6 +15,7 @@ import sim.util.Int2D;
 public class Vehicle extends OvalPortrayal2D implements Steppable
 {
 	public boolean hasItem = false;
+	public boolean collision = false;
 	
 	private Destination dest;
 	private Source src;
@@ -38,7 +39,12 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 			if ( hasItem )
 			{				
 				dest = job.getDestination();
-				path = vr.findPath(loc.toPoint(), dest.points());
+				path = vr.findPath(loc.toPoint(), dest.adjacentFunction(), collision);
+				if (path == null) {
+					collision = true;
+					path = vr.findPath(loc.toPoint(), dest.adjacentFunction(), collision);
+				}
+				
 				if (path != null)
 				{
 					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
@@ -46,13 +52,19 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 					{
 						hasItem = false;
 						job = null;
+						collision = false;
 					}
 				}
 			}
 			else
 			{
 				src = job.getSource();
-				path = vr.findPath(loc.toPoint(), src.points());
+				path = vr.findPath(loc.toPoint(), src.adjacentFunction(), collision);
+				if (path == null) {
+					collision = true;
+					path = vr.findPath(loc.toPoint(), src.adjacentFunction(), collision);
+				}
+				
 				
 				if (path != null)
 				{
@@ -60,6 +72,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 					if (path.size() == 1)
 					{
 						hasItem = true;
+						collision = false;
 					}
 				}		
 			}

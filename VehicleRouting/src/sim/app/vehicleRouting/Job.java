@@ -1,5 +1,8 @@
 package sim.app.vehicleRouting;
 
+import sim.app.util.Utils;
+
+
 public class Job implements Comparable<Job> {
 	private Source source;
 	private Destination destination;

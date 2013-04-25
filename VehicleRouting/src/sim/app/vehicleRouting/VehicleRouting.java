@@ -3,12 +3,10 @@ package sim.app.vehicleRouting;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import sim.app.packing.Bin;
 import sim.app.packing.FirstFit;
@@ -21,19 +19,11 @@ import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 
+import com.google.common.base.Function;
+
 @SuppressWarnings("serial")
 public class VehicleRouting extends SimState
 {
-	//############################################//
-	//############ CHANGABLE VARIABLES ############//
-	public PackingAlgorithm<Job> scheduler = new FirstFit<Job>();
-		
-	public final int NUM_JOBS			= 1000;
-	public final double LAMBDA			= -0.04;
-	public final int CURVE_TIGHTNESS	= 40;
-	
-	public int numVehicles 				= 20;
-	public int numDestinations 			= 5;
 	//############################################//
 	//############################################//
 	
@@ -48,62 +38,28 @@ public class VehicleRouting extends SimState
 	public final int SOURCE_AREA 		= 1;
 	public final int DESTINATION_AREA 	= 2;
 	
+	//############################################//
+	//############ CHANGABLE VARIABLES ############//
+	
+	public final int NUM_JOBS			= 1000;
+	public final double LAMBDA			= -0.04;
+	public final int CURVE_TIGHTNESS	= 40;
+	
+	public int numVehicles 				= 20;
+	public int numDestinations 			= 5;
+	
+	public PackingAlgorithm<Job> scheduler = new FirstFit<Job>();
+	
 	public IntGrid2D 	sourceGrid 		= new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
-	public IntGrid2D 	destinationGrid = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
 	public IntGrid2D 	obstacleGrid 	= new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
+	public IntGrid2D 	destinationGrid = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
 	public SparseGrid2D vehicleGrid 	= new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
-
+	
 	List<Vehicle> 		vehicles 		= new ArrayList<Vehicle>();
 	List<Source> 		sources 		= new ArrayList<Source>();
 	List<Destination> 	destinations 	= new ArrayList<Destination>();
+	
 	List<Job> 			unassignedJobs 	= new ArrayList<Job>();
-	
-	Map<Trip, List<Point>> shortestPaths = new HashMap<Trip, List<Point>>();
-
-	private class Trip {
-		private Point a;
-		private Set<Point> b;
-		public Trip(Point a, Set<Point> b)
-		{
-			this.a = a;
-			this.b  = b;
-		}
-	}
-	
-	public List<Point> findPath(Point start, Set<Point> dest)
-	{
-//		List<Point> path = shortestPaths.get(new Trip(start, dest));
-//		int x = path.get(0).x;
-//		int y = path.get(0).y;
-//		boolean[][] vehicleArray = get2DVehicleArray();
-//		if(vehicleArray[x][y])
-//		{
-//			path = getAlternatePath(start, dest);
-//		}
-		return getAlternatePath(start, dest);
-	}
-	
-	
-	
-	private void initializeShortestPaths()
-	{
-		Set<Point> destSet = new HashSet<Point>();
-		for (int i = 0; i < GRID_WIDTH; i++)
-		{
-			for(int j = 0; j < GRID_HEIGHT; j++)
-			{
-				for (int k = 0; k < GRID_WIDTH; k++)
-				{
-					for(int l = 0; l < GRID_HEIGHT; l++)
-					{
-						destSet.add(new Point(k,l));
-						shortestPaths.put(new Trip(new Point(i,j),  destSet), getCollisionPath(new Point(j,k), destSet));
-						destSet.clear();
-					}
-				}
-			}
-		}
-	}
 	
 	public VehicleRouting(long seed)
 	{ 
@@ -115,11 +71,10 @@ public class VehicleRouting extends SimState
 		super.start();
 
 		// read in data and create structures
-		initializeVehicles();
+//		initializeVehicles();
 		initializeSources();
 		initializeDestinations();
 		initializeObstacles();
-		//initializeShortestPaths();
 		initializeUnassignedJobs();
 
 		scheduleJobs();
@@ -171,21 +126,6 @@ public class VehicleRouting extends SimState
 			}
 		}
 		return closest;
-	}
-	
-	private void initializeVehicles()
-	{
-		for (int i = 0; i < numVehicles; i++) {
-			vehicles.add(new Vehicle());
-		}
-		
-		int offset = 0;
-		for(Vehicle v : vehicles)
-		{
-			vehicleGrid.setObjectLocation(v, offset, 0);
-			schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
-			offset++;
-		}		
 	}
 	
 	private void initializeDestinations()
@@ -276,6 +216,22 @@ public class VehicleRouting extends SimState
 		if (val > 0) numVehicles = val;
 	}
 
+	public List<Point> findPath(Point start, Function<Point, Boolean> goal, boolean considerVehicles)
+	{
+		if (!considerVehicles) {
+			List<Point> ignore = bfsIgnoreVehicles(start, goal);
+			Point p = ignore.get(0);
+			boolean[][] vehicleArray = get2DVehicleArray();
+			if (vehicleArray[p.x][p.y]) {
+				return null;
+			} else {
+				return ignore;
+			}
+		} else {
+			return bfs(start, goal);
+		}
+	}
+	
 	/**
 	 * Does a bfs to find the best path from source to a point
 	 * adjacent to dest, avoiding obstacles and other vehicles.
@@ -283,7 +239,7 @@ public class VehicleRouting extends SimState
 	 * The path returned is exclusive, it does not include the
 	 * source point or destination point
 	 */
-	public List<Point> getCollisionPath(Point start, Set<Point> dest) {
+	public List<Point> bfsIgnoreVehicles(Point start, Function<Point, Boolean> goal) {
 		boolean[][] v = new boolean[GRID_WIDTH][GRID_HEIGHT];
 		LinkedList<Node<Point>> q = new LinkedList<Node<Point>>();
 		q.add(new Node<Point>(start));
@@ -298,15 +254,14 @@ public class VehicleRouting extends SimState
 				continue;
 			}
 			v[p.x][p.y] = true;
-			for (Point d : dest) {
-				if (Utils.manhattanDistance(d, p) == 1) {
-					LinkedList<Point> path = new LinkedList<Point>();
-					while(n.parent != null) {
-						path.addFirst(n.data);
-						n = n.parent;
-					}
-					return path;
+			
+			if (goal.apply(p)) {
+				LinkedList<Point> path = new LinkedList<Point>();
+				while(n.parent != null) {
+					path.addFirst(n.data);
+					n = n.parent;
 				}
+				return path;
 			}
 			
 			q.add(new Node<Point>(new Point(p.x + 1, p.y), n));
@@ -325,7 +280,7 @@ public class VehicleRouting extends SimState
 	 * The path returned is exclusive, it does not include the
 	 * source point or destination point
 	 */
-	public List<Point> getAlternatePath(Point start, Set<Point> dest) {
+	public List<Point> bfs(Point start, Function<Point, Boolean> goal) {
 		boolean[][] v = new boolean[GRID_WIDTH][GRID_HEIGHT];
 		boolean[][] vehicleArray = get2DVehicleArray();
 		LinkedList<Node<Point>> q = new LinkedList<Node<Point>>();
@@ -342,15 +297,14 @@ public class VehicleRouting extends SimState
 				continue;
 			}
 			v[p.x][p.y] = true;
-			for (Point d : dest) {
-				if (Utils.manhattanDistance(d, p) == 1) {
-					LinkedList<Point> path = new LinkedList<Point>();
-					while(n.parent != null) {
-						path.addFirst(n.data);
-						n = n.parent;
-					}
-					return path;
+			
+			if (goal.apply(p)) {
+				LinkedList<Point> path = new LinkedList<Point>();
+				while(n.parent != null) {
+					path.addFirst(n.data);
+					n = n.parent;
 				}
+				return path;
 			}
 			
 			q.add(new Node<Point>(new Point(p.x + 1, p.y), n));
