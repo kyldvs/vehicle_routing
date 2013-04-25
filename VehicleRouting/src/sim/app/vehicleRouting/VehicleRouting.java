@@ -1,16 +1,20 @@
 package sim.app.vehicleRouting;
 
-import java.awt.Point; 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 
+import sim.app.packing.Bin;
+import sim.app.packing.FirstFit;
+import sim.app.packing.Packing;
+import sim.app.packing.PackingAlgorithm;
+import sim.app.packing.PackingAlgorithms;
 import sim.engine.Schedule;
 import sim.engine.SimState;
 import sim.field.grid.IntGrid2D;
@@ -22,7 +26,7 @@ public class VehicleRouting extends SimState
 {
 	//############################################//
 	//############ CHANGABLE VARIABLES ############//
-	public Scheduler scheduler = new Greedy();
+	public PackingAlgorithm<Job> scheduler = new FirstFit<>();
 		
 	public final int NUM_JOBS			= 1000;
 	public final double LAMBDA			= -0.04;
@@ -33,7 +37,7 @@ public class VehicleRouting extends SimState
 	//############################################//
 	//############################################//
 	
-	private HashMap<Vehicle, PriorityQueue<Job>> assignments = new HashMap<Vehicle, PriorityQueue<Job>>();
+	private Map<Vehicle, List<Job>> assignments = new HashMap<Vehicle, List<Job>>();
 	public static final Random random = new Random();
 	
 	public final int GRID_HEIGHT 		= 110;
@@ -68,15 +72,15 @@ public class VehicleRouting extends SimState
 	
 	public List<Point> findPath(Point start, Set<Point> dest)
 	{
-		List<Point> path = shortestPaths.get(new Trip(start, dest));
-		int x = path.get(0).x;
-		int y = path.get(0).y;
-		boolean[][] vehicleArray = get2DVehicleArray();
-		if(vehicleArray[x][y])
-		{
-			path = getAlternatePath(start, dest);
-		}
-		return getCollisionPath(start, dest);
+//		List<Point> path = shortestPaths.get(new Trip(start, dest));
+//		int x = path.get(0).x;
+//		int y = path.get(0).y;
+//		boolean[][] vehicleArray = get2DVehicleArray();
+//		if(vehicleArray[x][y])
+//		{
+//			path = getAlternatePath(start, dest);
+//		}
+		return getAlternatePath(start, dest);
 	}
 	
 	
@@ -115,13 +119,29 @@ public class VehicleRouting extends SimState
 		initializeSources();
 		initializeDestinations();
 		initializeObstacles();
-		
-		initializeShortestPaths();
-		
+		//initializeShortestPaths();
 		initializeUnassignedJobs();
-		scheduler.run(vehicles, unassignedJobs, assignments);
+
+		scheduleJobs();
 	}
 
+	private void scheduleJobs() {
+		// Schedule the jobs
+		Map<Job, Double> items = new HashMap<Job, Double>();
+		for (Job j : unassignedJobs) {
+			items.put(j, (double) j.getWeight());
+		}
+		
+		double capacity = PackingAlgorithms.minimizeCapacity(vehicles.size(), scheduler, items);
+		Packing<Job> packing = scheduler.pack(items, capacity);
+		
+		int i = 0;
+		for (Bin<Job> bin : packing.bins()) {
+			if (i >= vehicles.size()) break;
+			assignments.put(vehicles.get(i++), new ArrayList<Job>(bin.keys()));
+		}
+	}
+	
 	private void initializeUnassignedJobs()
 	{
 		int rand_x = 0, rand_y = 0;
@@ -369,21 +389,10 @@ public class VehicleRouting extends SimState
 	
 	public Job getJob(Vehicle v)
 	{
-		updateUnassignedJobs();
-		if(!unassignedJobs.isEmpty())
-		{
-			scheduler.run(vehicles, unassignedJobs, assignments);
-		}
-		
-		if(assignments.get(v) == null)
+		if(assignments.get(v) == null || assignments.get(v).isEmpty())
 		{
 			return null;
 		}
-		return assignments.get(v).poll();
-	}
-	
-	private void updateUnassignedJobs()
-	{
-		
+		return assignments.get(v).remove(0);
 	}
 }

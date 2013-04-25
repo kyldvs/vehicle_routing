@@ -29,6 +29,10 @@ public class Packing<T> {
 		}
 	}
 
+	public List<Bin<T>> bins() {
+		return new ArrayList<Bin<T>>(packing);
+	}
+	
 	public int size() {
 		return packing.size();
 	}
