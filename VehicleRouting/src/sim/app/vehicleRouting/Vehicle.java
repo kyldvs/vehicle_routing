@@ -7,6 +7,7 @@ import java.util.List;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Int2D;
@@ -20,6 +21,8 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 	private Destination dest;
 	private Source src;
 	private Job job;
+	
+	private Stoppable stop;
 
 	private Color noItemColor 	= Color.blue;
 	private Color itemColor 	= Color.red;
@@ -33,6 +36,9 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 		if(job == null)
 		{
 			setJob(vr.getJob(this));
+			if (job == null) {
+				stop.stop();
+			}
 		}
 		else
 		{
@@ -119,5 +125,9 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 
 	public void setJob(Job job) {
 		this.job = job;
+	}
+	
+	public void setStoppable(Stoppable stop) {
+		this.stop = stop;
 	}
 }
