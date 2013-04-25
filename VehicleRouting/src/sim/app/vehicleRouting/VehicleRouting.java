@@ -3,8 +3,10 @@ package sim.app.vehicleRouting;
 import java.awt.Point; 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
@@ -51,7 +53,54 @@ public class VehicleRouting extends SimState
 	List<Source> 		sources 		= new ArrayList<Source>();
 	List<Destination> 	destinations 	= new ArrayList<Destination>();
 	List<Job> 			unassignedJobs 	= new ArrayList<Job>();
+	
+	Map<Trip, List<Point>> shortestPaths = new HashMap<Trip, List<Point>>();
 
+	private class Trip {
+		private Point a;
+		private Set<Point> b;
+		public Trip(Point a, Set<Point> b)
+		{
+			this.a = a;
+			this.b  = b;
+		}
+	}
+	
+	public List<Point> findPath(Point start, Set<Point> dest)
+	{
+		List<Point> path = shortestPaths.get(new Trip(start, dest));
+		int x = path.get(0).x;
+		int y = path.get(0).y;
+		boolean[][] vehicleArray = get2DVehicleArray();
+		if(vehicleArray[x][y])
+		{
+			path = getAlternatePath(start, dest);
+		}
+		return getCollisionPath(start, dest);
+	}
+	
+	
+	
+	private void initializeShortestPaths()
+	{
+		Set<Point> destSet = new HashSet<Point>();
+		for (int i = 0; i < GRID_WIDTH; i++)
+		{
+			for(int j = 0; j < GRID_HEIGHT; j++)
+			{
+				for (int k = 0; k < GRID_WIDTH; k++)
+				{
+					for(int l = 0; l < GRID_HEIGHT; l++)
+					{
+						destSet.add(new Point(k,l));
+						shortestPaths.put(new Trip(new Point(i,j),  destSet), getCollisionPath(new Point(j,k), destSet));
+						destSet.clear();
+					}
+				}
+			}
+		}
+	}
+	
 	public VehicleRouting(long seed)
 	{ 
 		super(seed);
@@ -66,6 +115,8 @@ public class VehicleRouting extends SimState
 		initializeSources();
 		initializeDestinations();
 		initializeObstacles();
+		
+		initializeShortestPaths();
 		
 		initializeUnassignedJobs();
 		scheduler.run(vehicles, unassignedJobs, assignments);
@@ -212,7 +263,49 @@ public class VehicleRouting extends SimState
 	 * The path returned is exclusive, it does not include the
 	 * source point or destination point
 	 */
-	public List<Point> getPath(Point start, Set<Point> dest) {
+	public List<Point> getCollisionPath(Point start, Set<Point> dest) {
+		boolean[][] v = new boolean[GRID_WIDTH][GRID_HEIGHT];
+		LinkedList<Node<Point>> q = new LinkedList<Node<Point>>();
+		q.add(new Node<Point>(start));
+
+		while(!q.isEmpty()) {
+			Node<Point> n = q.remove();
+			Point p = n.data;
+			if (p.x < 0 || p.x >= GRID_WIDTH ||
+				p.y < 0 || p.y >= GRID_HEIGHT || 
+				v[p.x][p.y] ||
+				obstacleGrid.get(p.x, p.y) != EMPTY_AREA) {
+				continue;
+			}
+			v[p.x][p.y] = true;
+			for (Point d : dest) {
+				if (Utils.manhattanDistance(d, p) == 1) {
+					LinkedList<Point> path = new LinkedList<Point>();
+					while(n.parent != null) {
+						path.addFirst(n.data);
+						n = n.parent;
+					}
+					return path;
+				}
+			}
+			
+			q.add(new Node<Point>(new Point(p.x + 1, p.y), n));
+			q.add(new Node<Point>(new Point(p.x - 1, p.y), n));
+			q.add(new Node<Point>(new Point(p.x, p.y + 1), n));
+			q.add(new Node<Point>(new Point(p.x, p.y - 1), n));
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Does a bfs to find the best path from source to a point
+	 * adjacent to dest, avoiding obstacles and other vehicles.
+	 * 
+	 * The path returned is exclusive, it does not include the
+	 * source point or destination point
+	 */
+	public List<Point> getAlternatePath(Point start, Set<Point> dest) {
 		boolean[][] v = new boolean[GRID_WIDTH][GRID_HEIGHT];
 		boolean[][] vehicleArray = get2DVehicleArray();
 		LinkedList<Node<Point>> q = new LinkedList<Node<Point>>();

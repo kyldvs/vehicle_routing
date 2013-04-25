@@ -26,7 +26,7 @@ public class Annealing<T> implements PackingAlgorithm<T> {
 		
 		// FFD
 		List<Set<Integer>> ffdBins = new ArrayList<>();
-		List<Integer> ffdTotals = new ArrayList<>();
+		List<Integer> ffdTotals = new ArrayList<Integer>();
 		ffdBins.add(new HashSet<Integer>());
 		ffdTotals.add(0);
 

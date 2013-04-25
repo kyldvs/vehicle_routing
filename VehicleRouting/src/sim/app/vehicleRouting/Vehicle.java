@@ -38,7 +38,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 			if ( hasItem )
 			{				
 				dest = job.getDestination();
-				path = vr.getPath(loc.toPoint(), dest.points());
+				path = vr.findPath(loc.toPoint(), dest.points());
 				if (path != null)
 				{
 					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
@@ -52,7 +52,8 @@ public class Vehicle extends OvalPortrayal2D implements Steppable
 			else
 			{
 				src = job.getSource();
-				path = vr.getPath(loc.toPoint(), src.points());
+				path = vr.findPath(loc.toPoint(), src.points());
+				
 				if (path != null)
 				{
 					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
