@@ -43,11 +43,11 @@ public class VehicleRouting extends SimState
 	//############ CHANGABLE VARIABLES ############//
 	
 	public final int NUM_JOBS			= 1000;
-	public final double LAMBDA			= -0.04;
-	public final int CURVE_TIGHTNESS	= 40;
+	public final double LAMBDA			= -0.01; // USE THIS FOR TYPICAL ISLES -0.04;
+	public final int CURVE_TIGHTNESS	= 100; // USE THIS FOR TYPICAL ISLES 40;
 	
 	public int numVehicles 				= 20;
-	public int numDestinations 			= 5;
+	public int numDestinations 			= 12;
 	
 	public PackingAlgorithm<Job> scheduler = new FirstFit<Job>();
 	public TopoVariables variables = new TopoVariables(numVehicles, numDestinations, GRID_HEIGHT, GRID_WIDTH);
@@ -77,6 +77,9 @@ public class VehicleRouting extends SimState
 		initializeSources();
 		initializeDestinations();
 		initializeObstacles();
+		
+		initializeVehicleLocations();
+		
 		initializeUnassignedJobs();
 
 		scheduleJobs();
@@ -147,12 +150,60 @@ public class VehicleRouting extends SimState
 	
 	private void initializeDestinations()
 	{
-		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
+//####################################################################################################
+//		TOPO #1
+//		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
+//		for (int i = 0; i < numDestinations; i++)
+//		{
+//			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
+//		}
+//####################################################################################################
+		
+//####################################################################################################
+//		TOPO 2
+//		int startx = GRID_WIDTH / 2 - (numDestinations / 4 * 4);
+//		for (int i = 0; i < numDestinations/2; i++)
+//		{
+//			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
+//		}
+//		
+//		startx = GRID_WIDTH / 2 - (numDestinations / 4 * 4);
+//		for (int i = 0; i < numDestinations/2; i++)
+//		{
+//			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, 4, 6));
+//		}
+//####################################################################################################
+		
+//####################################################################################################
+//		TOPO 3
+//		int starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
+//		for (int i = 0; i < numDestinations; i++)
+//		{
+//			destinations.add(new Destination(GRID_WIDTH/2 - 1, GRID_WIDTH/2 + 1, starty + (i * 8), starty + (i * 8) + 2));
+//		}
+//####################################################################################################		
+		
+//####################################################################################################
+//		TOPO 4
+		int starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
 		for (int i = 0; i < numDestinations; i++)
 		{
-			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
+			destinations.add(new Destination(GRID_WIDTH - 4, GRID_WIDTH - 2, starty + (i * 8), starty + (i * 8) + 2));
+		}
+		
+		starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
+		for (int i = 0; i < numDestinations; i++)
+		{
+			destinations.add(new Destination(2, 4, starty + (i * 8), starty + (i * 8) + 2));
 		}
 
+//####################################################################################################		
+		
+		
+		
+		
+		
+		
 		for(Destination d : destinations)
 		{
 			for( int x = d.getxMin() ; x <= d.getxMax() ; x++ )
@@ -167,54 +218,179 @@ public class VehicleRouting extends SimState
 	
 	private void initializeSources()
 	{
-		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-		{
-			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-			{
-				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
-					sources.add(new Source(x, x, y, y));
-				}
-			}
-		}
-
-		for(Source s : sources)
-		{
-			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
-			{
-				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+//####################################################################################################
+// topo 1
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+//					sources.add(new Source(x, x, y, y));
+//				}
+//			}
+//		}
+//
+//		for(Source s : sources)
+//		{
+//			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+//			{
+//				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+//				{
+//					sourceGrid.field[x][y] = SOURCE_AREA;
+//				}
+//			}
+//		}
+//####################################################################################################
+		
+//####################################################################################################
+//topo 2
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (y % 2 == 0 && y < GRID_HEIGHT - 10 && y > 10 && ((x < GRID_WIDTH - 2 && x > GRID_WIDTH/2 + 5)||(x <= GRID_WIDTH/2 - 5 && x >= 0 + 2))) {
+//					sources.add(new Source(x, x, y, y));
+//				}
+//			}
+//		}
+//
+//		for(Source s : sources)
+//		{
+//			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+//			{
+//				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+//				{
+//					sourceGrid.field[x][y] = SOURCE_AREA;
+//				}
+//			}
+//		}
+//	}
+//####################################################################################################
+		
+//####################################################################################################
+//topo 3
+//				for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//				{
+//					for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//					{
+//						if (y % 2 == 0 && ((x < GRID_WIDTH - 2 && x > GRID_WIDTH/2 + 5)||(x <= GRID_WIDTH/2 - 5 && x >= 0 + 2))) {
+//							sources.add(new Source(x, x, y, y));
+//						}
+//					}
+//				}
+//
+//				for(Source s : sources)
+//				{
+//					for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+//					{
+//						for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+//						{
+//							sourceGrid.field[x][y] = SOURCE_AREA;
+//						}
+//					}
+//				}
+//			}
+//####################################################################################################
+		
+//####################################################################################################
+//topo 4
+				for( int x = 0 ; x < GRID_WIDTH ; x++ )
 				{
-					sourceGrid.field[x][y] = SOURCE_AREA;
+					for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+					{
+						if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
+							sources.add(new Source(x, x, y, y));
+						}
+					}
+				}
+
+				for(Source s : sources)
+				{
+					for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+					{
+						for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+						{
+							sourceGrid.field[x][y] = SOURCE_AREA;
+						}
+					}
 				}
 			}
-		}		
-	}
+//####################################################################################################
 	
 	private void initializeObstacles()
 	{
+//####################################################################################################
+// topo 1
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+//				}
+//			}
+//		}
+//####################################################################################################
+		
+
+//####################################################################################################
+// Topo 2
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (y % 2 == 0 && y < GRID_HEIGHT - 10 && y > 10 && ((x < GRID_WIDTH - 2 && x > GRID_WIDTH/2 + 5)||(x <= GRID_WIDTH/2 - 5 && x >= 0 + 2))) {
+//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+//				}
+//			}
+//		}
+//	}
+//####################################################################################################
+	
+//####################################################################################################
+// Topo 3
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (y % 2 == 0 && ((x < GRID_WIDTH - 2 && x > GRID_WIDTH/2 + 5)||(x <= GRID_WIDTH/2 - 5 && x >= 0 + 2))) {
+//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+//				}
+//			}
+//		}
+//	}
+//####################################################################################################
+
+//####################################################################################################
+// Topo 4
 		for( int x = 0 ; x < GRID_WIDTH ; x++ )
 		{
 			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
 			{
-				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+				if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
 					obstacleGrid.field[x][y] = OBSTACLE_AREA;
 				}
 			}
 		}
-
+	}
+//####################################################################################################
+	
+	private void initializeVehicleLocations()
+	{
 		// initialize vehicle locations
 		int vx = 1;
-		int vy = 100;
+		int vy = 101;
 		for(Vehicle v : vehicles)
 		{
 			vehicleGrid.setObjectLocation(v, vx, vy);
 			schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
 			vx += 2;
-			if (vx >= GRID_WIDTH - 1) {
+			if (vx >= GRID_WIDTH - 1) 
+			{
 				vy += 2;
 				vx = 1;
 			}
 		}
-
 	}
 
 	public static void main(String[] args)
