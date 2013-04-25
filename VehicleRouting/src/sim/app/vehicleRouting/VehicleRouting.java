@@ -13,6 +13,7 @@ import sim.app.packing.FirstFit;
 import sim.app.packing.Packing;
 import sim.app.packing.PackingAlgorithm;
 import sim.app.packing.PackingAlgorithms;
+import sim.app.topo.TopoVariables;
 import sim.engine.Schedule;
 import sim.engine.SimState;
 import sim.field.grid.IntGrid2D;
@@ -49,6 +50,7 @@ public class VehicleRouting extends SimState
 	public int numDestinations 			= 5;
 	
 	public PackingAlgorithm<Job> scheduler = new FirstFit<Job>();
+	public TopoVariables variables = new TopoVariables(numVehicles, numDestinations, GRID_HEIGHT, GRID_WIDTH);
 	
 	public IntGrid2D 	sourceGrid 		= new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
 	public IntGrid2D 	obstacleGrid 	= new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
@@ -71,7 +73,7 @@ public class VehicleRouting extends SimState
 		super.start();
 
 		// read in data and create structures
-//		initializeVehicles();
+		initializeVehicles();
 		initializeSources();
 		initializeDestinations();
 		initializeObstacles();
@@ -126,6 +128,21 @@ public class VehicleRouting extends SimState
 			}
 		}
 		return closest;
+	}
+	
+	private void initializeVehicles()
+	{
+		for (int i = 0; i < numVehicles; i++) {
+			vehicles.add(new Vehicle());
+		}
+		
+		int offset = 0;
+		for(Vehicle v : vehicles)
+		{
+			vehicleGrid.setObjectLocation(v, offset, 0);
+			schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
+			offset++;
+		}		
 	}
 	
 	private void initializeDestinations()
