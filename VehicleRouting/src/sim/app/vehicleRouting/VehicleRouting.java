@@ -46,8 +46,8 @@ public class VehicleRouting extends SimState
 	//############ CHANGABLE VARIABLES ############//
 	
 	public final int NUM_JOBS			= 1000;
-	public final double LAMBDA			= -0.01; // USE THIS FOR TYPICAL ISLES -0.04;
-	public final int CURVE_TIGHTNESS	= 100; // USE THIS FOR TYPICAL ISLES 40;
+	public final double LAMBDA			= -0.04;
+	public final int CURVE_TIGHTNESS	= 40;
 	
 	public int numVehicles 				= 20;
 	public int numDestinations 			= 12;
@@ -69,6 +69,11 @@ public class VehicleRouting extends SimState
 	public VehicleRouting(long seed)
 	{ 
 		super(seed);
+	}
+	
+	public int getCollisions()
+	{
+		return collisions;
 	}
 	
 	public void start()
@@ -141,26 +146,17 @@ public class VehicleRouting extends SimState
 		for (int i = 0; i < numVehicles; i++) {
 			vehicles.add(new Vehicle());
 		}
-		
-		int offset = 0;
-		for(Vehicle v : vehicles)
-		{
-			vehicleGrid.setObjectLocation(v, offset, 0);
-			Stoppable stop = schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
-			v.setStoppable(stop);
-			offset++;
-		}		
 	}
 	
 	private void initializeDestinations()
 	{
 //####################################################################################################
 //		TOPO #1
-//		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
-//		for (int i = 0; i < numDestinations; i++)
-//		{
-//			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
-//		}
+		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
+		for (int i = 0; i < numDestinations; i++)
+		{
+			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
+		}
 //####################################################################################################
 		
 //####################################################################################################
@@ -189,18 +185,18 @@ public class VehicleRouting extends SimState
 		
 //####################################################################################################
 //		TOPO 4
-		int starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
-		for (int i = 0; i < numDestinations; i++)
-		{
-			destinations.add(new Destination(GRID_WIDTH - 4, GRID_WIDTH - 2, starty + (i * 8), starty + (i * 8) + 2));
-		}
-		
-		starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
-		for (int i = 0; i < numDestinations; i++)
-		{
-			destinations.add(new Destination(2, 4, starty + (i * 8), starty + (i * 8) + 2));
-		}
-
+//		int starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
+//		for (int i = 0; i < numDestinations; i++)
+//		{
+//			destinations.add(new Destination(GRID_WIDTH - 4, GRID_WIDTH - 2, starty + (i * 8), starty + (i * 8) + 2));
+//		}
+//		
+//		starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
+//		for (int i = 0; i < numDestinations; i++)
+//		{
+//			destinations.add(new Destination(2, 4, starty + (i * 8), starty + (i * 8) + 2));
+//		}
+//
 //####################################################################################################		
 		
 		
@@ -224,26 +220,27 @@ public class VehicleRouting extends SimState
 	{
 //####################################################################################################
 // topo 1
-//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-//		{
-//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-//			{
-//				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
-//					sources.add(new Source(x, x, y, y));
-//				}
-//			}
-//		}
-//
-//		for(Source s : sources)
-//		{
-//			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
-//			{
-//				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
-//				{
-//					sourceGrid.field[x][y] = SOURCE_AREA;
-//				}
-//			}
-//		}
+		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+		{
+			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+			{
+				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+					sources.add(new Source(x, x, y, y));
+				}
+			}
+		}
+
+		for(Source s : sources)
+		{
+			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+			{
+				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+				{
+					sourceGrid.field[x][y] = SOURCE_AREA;
+				}
+			}
+		}
+	}
 //####################################################################################################
 		
 //####################################################################################################
@@ -298,42 +295,43 @@ public class VehicleRouting extends SimState
 		
 //####################################################################################################
 //topo 4
-				for( int x = 0 ; x < GRID_WIDTH ; x++ )
-				{
-					for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-					{
-						if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
-							sources.add(new Source(x, x, y, y));
-						}
-					}
-				}
-
-				for(Source s : sources)
-				{
-					for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
-					{
-						for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
-						{
-							sourceGrid.field[x][y] = SOURCE_AREA;
-						}
-					}
-				}
-			}
+//				for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//				{
+//					for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//					{
+//						if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
+//							sources.add(new Source(x, x, y, y));
+//						}
+//					}
+//				}
+//
+//				for(Source s : sources)
+//				{
+//					for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+//					{
+//						for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+//						{
+//							sourceGrid.field[x][y] = SOURCE_AREA;
+//						}
+//					}
+//				}
+//			}
 //####################################################################################################
 	
 	private void initializeObstacles()
 	{
 //####################################################################################################
 // topo 1
-//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-//		{
-//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-//			{
-//				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
-//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
-//				}
-//			}
-//		}
+		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+		{
+			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+			{
+				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+				}
+			}
+		}
+	}
 //####################################################################################################
 		
 
@@ -367,16 +365,16 @@ public class VehicleRouting extends SimState
 
 //####################################################################################################
 // Topo 4
-		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-		{
-			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-			{
-				if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
-					obstacleGrid.field[x][y] = OBSTACLE_AREA;
-				}
-			}
-		}
-	}
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
+//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+//				}
+//			}
+//		}
+//	}
 //####################################################################################################
 	
 	private void initializeVehicleLocations()
@@ -387,7 +385,8 @@ public class VehicleRouting extends SimState
 		for(Vehicle v : vehicles)
 		{
 			vehicleGrid.setObjectLocation(v, vx, vy);
-			schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
+			Stoppable stop = schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
+			v.setStoppable(stop);
 			vx += 2;
 			if (vx >= GRID_WIDTH - 1) 
 			{
@@ -418,7 +417,7 @@ public class VehicleRouting extends SimState
 		if (!considerVehicles) {
 			List<Point> ignore = bfsIgnoreVehicles(start, goal);
 			Point p = ignore.get(0);
-			boolean[][] vehicleArray = get2DVehicleArray();
+			boolean[][] vehicleArray = et2DVehicleArray();
 			if (vehicleArray[p.x][p.y]) {
 				return null;
 			} else {
@@ -479,7 +478,7 @@ public class VehicleRouting extends SimState
 	 */
 	public List<Point> bfs(Point start, Function<Point, Boolean> goal) {
 		boolean[][] v = new boolean[GRID_WIDTH][GRID_HEIGHT];
-		boolean[][] vehicleArray = get2DVehicleArray();
+		boolean[][] vehicleArray = et2DVehicleArray();
 		LinkedList<Node<Point>> q = new LinkedList<Node<Point>>();
 		q.add(new Node<Point>(start));
 
@@ -513,7 +512,7 @@ public class VehicleRouting extends SimState
 		return null;
 	}
 	
-	public boolean[][] get2DVehicleArray() {
+	public boolean[][] et2DVehicleArray() {
 		boolean[][] b = new boolean[GRID_WIDTH][GRID_HEIGHT];
 		for (Vehicle v : vehicles) {
 			Int2D loc = vehicleGrid.getObjectLocation(v);
