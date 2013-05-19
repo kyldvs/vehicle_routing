@@ -13,6 +13,7 @@ import sim.app.packing.FirstFit;
 import sim.app.packing.Packing;
 import sim.app.packing.PackingAlgorithm;
 import sim.app.packing.PackingAlgorithms;
+import sim.app.stats.Statistics;
 import sim.app.topo.TopoVariables;
 import sim.engine.Schedule;
 import sim.engine.SimState;
@@ -66,9 +67,12 @@ public class VehicleRouting extends SimState
 	
 	List<Job> 			unassignedJobs 	= new ArrayList<Job>();
 	
+	private final Statistics stats;
+	
 	public VehicleRouting(long seed)
 	{ 
 		super(seed);
+		this.stats = new Statistics();
 	}
 	
 	public void start()
@@ -86,6 +90,12 @@ public class VehicleRouting extends SimState
 		initializeUnassignedJobs();
 
 		scheduleJobs();
+	}
+	
+	@Override
+	public void kill() {
+		System.out.printf("%d jobs completed in %d steps.", stats.getJobsCompleted(), stats.getSteps());
+		super.kill();
 	}
 
 	private void scheduleJobs() {
@@ -139,7 +149,7 @@ public class VehicleRouting extends SimState
 	private void initializeVehicles()
 	{
 		for (int i = 0; i < numVehicles; i++) {
-			vehicles.add(new Vehicle());
+			vehicles.add(new Vehicle(stats));
 		}
 		
 		int offset = 0;
@@ -156,11 +166,11 @@ public class VehicleRouting extends SimState
 	{
 //####################################################################################################
 //		TOPO #1
-//		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
-//		for (int i = 0; i < numDestinations; i++)
-//		{
-//			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
-//		}
+		int startx = GRID_WIDTH / 2 - (numDestinations / 2 * 4);
+		for (int i = 0; i < numDestinations; i++)
+		{
+			destinations.add(new Destination(startx + (i * 4), startx + (i * 4) + 2, GRID_HEIGHT - 6, GRID_HEIGHT - 4));
+		}
 //####################################################################################################
 		
 //####################################################################################################
@@ -189,18 +199,18 @@ public class VehicleRouting extends SimState
 		
 //####################################################################################################
 //		TOPO 4
-		int starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
-		for (int i = 0; i < numDestinations; i++)
-		{
-			destinations.add(new Destination(GRID_WIDTH - 4, GRID_WIDTH - 2, starty + (i * 8), starty + (i * 8) + 2));
-		}
-		
-		starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
-		for (int i = 0; i < numDestinations; i++)
-		{
-			destinations.add(new Destination(2, 4, starty + (i * 8), starty + (i * 8) + 2));
-		}
-
+//		int starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
+//		for (int i = 0; i < numDestinations; i++)
+//		{
+//			destinations.add(new Destination(GRID_WIDTH - 4, GRID_WIDTH - 2, starty + (i * 8), starty + (i * 8) + 2));
+//		}
+//		
+//		starty = GRID_HEIGHT / 2 - (numDestinations / 2 * 8);
+//		for (int i = 0; i < numDestinations; i++)
+//		{
+//			destinations.add(new Destination(2, 4, starty + (i * 8), starty + (i * 8) + 2));
+//		}
+//
 //####################################################################################################		
 		
 		
@@ -224,26 +234,27 @@ public class VehicleRouting extends SimState
 	{
 //####################################################################################################
 // topo 1
-//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-//		{
-//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-//			{
-//				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
-//					sources.add(new Source(x, x, y, y));
-//				}
-//			}
-//		}
-//
-//		for(Source s : sources)
-//		{
-//			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
-//			{
-//				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
-//				{
-//					sourceGrid.field[x][y] = SOURCE_AREA;
-//				}
-//			}
-//		}
+		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+		{
+			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+			{
+				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+					sources.add(new Source(x, x, y, y));
+				}
+			}
+		}
+
+		for(Source s : sources)
+		{
+			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+			{
+				for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+				{
+					sourceGrid.field[x][y] = SOURCE_AREA;
+				}
+			}
+		}
+	}
 //####################################################################################################
 		
 //####################################################################################################
@@ -298,42 +309,42 @@ public class VehicleRouting extends SimState
 		
 //####################################################################################################
 //topo 4
-				for( int x = 0 ; x < GRID_WIDTH ; x++ )
-				{
-					for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-					{
-						if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
-							sources.add(new Source(x, x, y, y));
-						}
-					}
-				}
-
-				for(Source s : sources)
-				{
-					for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
-					{
-						for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
-						{
-							sourceGrid.field[x][y] = SOURCE_AREA;
-						}
-					}
-				}
-			}
+//				for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//				{
+//					for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//					{
+//						if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
+//							sources.add(new Source(x, x, y, y));
+//						}
+//					}
+//				}
+//
+//				for(Source s : sources)
+//				{
+//					for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
+//					{
+//						for( int y = s.getyMin() ; y <= s.getyMax() ; y++ )
+//						{
+//							sourceGrid.field[x][y] = SOURCE_AREA;
+//						}
+//					}
+//				}
+//			}
 //####################################################################################################
 	
 	private void initializeObstacles()
 	{
 //####################################################################################################
 // topo 1
-//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-//		{
-//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-//			{
-//				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
-//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
-//				}
-//			}
-//		}
+		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+		{
+			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+			{
+				if (x % 2 == 0 && y >= 2 && y < GRID_HEIGHT - 10) {
+					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+				}
+			}
+		}
 //####################################################################################################
 		
 
@@ -367,15 +378,15 @@ public class VehicleRouting extends SimState
 
 //####################################################################################################
 // Topo 4
-		for( int x = 0 ; x < GRID_WIDTH ; x++ )
-		{
-			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
-			{
-				if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
-					obstacleGrid.field[x][y] = OBSTACLE_AREA;
-				}
-			}
-		}
+//		for( int x = 0 ; x < GRID_WIDTH ; x++ )
+//		{
+//			for( int y = 0 ; y < GRID_HEIGHT ; y++ )
+//			{
+//				if (y % 2 == 0 && x < GRID_WIDTH - 8 && x >= 0 + 8) {
+//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+//				}
+//			}
+//		}
 	}
 //####################################################################################################
 	
@@ -412,21 +423,25 @@ public class VehicleRouting extends SimState
 	{
 		if (val > 0) numVehicles = val;
 	}
+	
+	public int getCollisions() {
+		return collisions;
+	}
 
 	public List<Point> findPath(Point start, Function<Point, Boolean> goal, boolean considerVehicles)
 	{
-		if (!considerVehicles) {
-			List<Point> ignore = bfsIgnoreVehicles(start, goal);
-			Point p = ignore.get(0);
-			boolean[][] vehicleArray = get2DVehicleArray();
-			if (vehicleArray[p.x][p.y]) {
-				return null;
-			} else {
-				return ignore;
-			}
-		} else {
+//		if (!considerVehicles) {
+//			List<Point> ignore = bfsIgnoreVehicles(start, goal);
+//			Point p = ignore.get(0);
+//			boolean[][] vehicleArray = get2DVehicleArray();
+//			if (vehicleArray[p.x][p.y]) {
+//				return null;
+//			} else {
+//				return ignore;
+//			}
+//		} else {
 			return bfs(start, goal);
-		}
+//		}
 	}
 	
 	/**
