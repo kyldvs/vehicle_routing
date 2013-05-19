@@ -19,7 +19,9 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 	private static int counter = 0;
 	private final int uid = counter++;
 	
-	private final Statistics stats;
+	private Statistics stats;
+	private Stoppable stop;
+	
 	private int step = 0;
 
 	public boolean hasItem = false;
@@ -29,13 +31,12 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 	private Source src;
 	private Job job;
 
-	private Stoppable stop;
 
 	private Color noItemColor = Color.blue;
 	private Color itemColor = Color.red;
 
-	public Vehicle(Statistics stats) {
-		this.stats = stats;
+	public Vehicle() {
+		// Default Constructor
 	}
 	
 	@Override
@@ -73,7 +74,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 						collision);
 				if (path == null) {
 					collision = true;
-					vr.collisions++;
+					stats.collision();
 					path = vr.findPath(loc.toPoint(), dest.adjacentFunction(),
 							collision);
 				}
@@ -94,7 +95,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 						collision);
 				if (path == null) {
 					collision = true;
-					vr.collisions++;
+					stats.collision();
 					path = vr.findPath(loc.toPoint(), src.adjacentFunction(),
 							collision);
 				}
@@ -146,6 +147,10 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 
 	public void setStoppable(Stoppable stop) {
 		this.stop = stop;
+	}
+	
+	public void setStats(Statistics stats) {
+		this.stats = stats;
 	}
 	
 	public int getStep() {

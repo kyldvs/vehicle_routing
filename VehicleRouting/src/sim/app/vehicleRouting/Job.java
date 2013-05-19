@@ -10,14 +10,12 @@ public class Job implements Comparable<Job> {
 	
 	private Source source;
 	private Destination destination;
-	private int priority;
 	private int weight;
 
-	public Job(Source source, Destination destination, int priority)
+	public Job(Source source, Destination destination)
 	{
 			this.setSource(source);
 			this.setDestination(destination);
-			this.setPriority(priority);
 			this.setWeight(Utils.manhattanDistance(source.point, destination.point));
 	}
 	
@@ -37,16 +35,8 @@ public class Job implements Comparable<Job> {
 		this.destination = destination;
 	}
 
-	public int getPriority() {
-		return priority;
-	}
-
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
-	
 	public int compareTo(Job j) {
-		return this.getPriority() - j.getPriority();
+		return this.getWeight() - j.getWeight();
 	}
 
 	public int getWeight() {

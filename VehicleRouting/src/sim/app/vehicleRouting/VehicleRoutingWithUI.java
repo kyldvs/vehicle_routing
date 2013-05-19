@@ -1,10 +1,19 @@
 package sim.app.vehicleRouting;
 
-import sim.engine.*;
-import sim.display.*;
-import sim.portrayal.grid.*;
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+
+import javax.swing.JFrame;
+
+import sim.app.packing.FirstFit;
+import sim.app.packing.PackingAlgorithm;
+import sim.app.topo.Topology;
+import sim.app.topo.Topos;
+import sim.display.Controller;
+import sim.display.Display2D;
+import sim.display.GUIState;
+import sim.engine.SimState;
+import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.SparseGridPortrayal2D;
 
 public class VehicleRoutingWithUI extends GUIState{
 	
@@ -26,12 +35,7 @@ public class VehicleRoutingWithUI extends GUIState{
     
     public VehicleRoutingWithUI()
     {
-    	super(new VehicleRouting(System.currentTimeMillis()));
-    }
-    
-    public VehicleRoutingWithUI(SimState state)
-    {
-    	super(state);
+    	super(new VehicleRouting(1));
     }
     
     public Object getSimulationInspectedObject()
