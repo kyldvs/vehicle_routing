@@ -115,16 +115,16 @@ public class Topos {
 			
 			@Override
 			public void vehicles(VehicleRouting vr) {
-				int x = 1;
-				int y = 101;
+				int x = 47;
+				int y = 4;
 				for (int i = 0; i < numVehicles; i++)
 				{
 					vr.addVehicle(x, y);
-					x += 2;
-					if (x >= VehicleRouting.GRID_WIDTH - 1) 
+					y += 2;
+					if (y >= VehicleRouting.GRID_HEIGHT - 1) 
 					{
-						y += 2;
-						x = 1;
+						x += 2;
+						y = 2;
 					}
 				}
 			}
@@ -161,16 +161,16 @@ public class Topos {
 			
 			@Override
 			public void vehicles(VehicleRouting vr) {
-				int x = 1;
-				int y = 101;
+				int x = 5;
+				int y = 4;
 				for (int i = 0; i < numVehicles; i++)
 				{
 					vr.addVehicle(x, y);
-					x += 2;
-					if (x >= VehicleRouting.GRID_WIDTH - 1) 
+					y += 2;
+					if (y >= VehicleRouting.GRID_HEIGHT - 1) 
 					{
-						y += 2;
-						x = 1;
+						x += 2;
+						y = 2;
 					}
 				}
 			}

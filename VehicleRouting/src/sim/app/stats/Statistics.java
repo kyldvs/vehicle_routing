@@ -11,14 +11,14 @@ import com.google.common.collect.Maps;
 public class Statistics {
 
 	private int steps;
-	private int collisions;
+	private int stuck;
 	private int jobsCompleted;
 	
 	private Map<Vehicle, JobRoutes> routes; 
 	
 	public Statistics() {
 		this.steps = 0;
-		this.collisions = 0;
+		this.stuck = 0;
 		this.jobsCompleted = 0;
 		this.routes = Maps.newHashMap();
 	}
@@ -35,12 +35,12 @@ public class Statistics {
 		this.steps = Math.max(this.steps, steps);
 	}
 	
-	public void collision() {
-		collisions++;
+	public void stuck() {
+		stuck++;
 	}
 	
-	public int getCollisions() {
-		return collisions;
+	public int getStuck() {
+		return stuck;
 	}
 	
 	public void deliver(Vehicle v, Job job, Point p) {

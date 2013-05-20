@@ -417,6 +417,7 @@ public class SimState implements java.io.Serializable {
 	 * </ul>
 	 */
 	public static void doLoop(MakesSimState generator, String[] args) {
+		boolean out = false;
 		// print help?
 		if (keyExists("-help", args, 0)) {
 			System.err
@@ -471,7 +472,8 @@ public class SimState implements java.io.Serializable {
 
 		java.text.NumberFormat n = java.text.NumberFormat.getInstance();
 		n.setMinimumFractionDigits(0);
-		System.err.println("MASON Version " + n.format(version())
+		
+		if(out) System.err.println("MASON Version " + n.format(version())
 				+ ".  For further options, try adding ' -help' at end.");
 
 		// figure the checkpoint modulo
@@ -603,9 +605,9 @@ public class SimState implements java.io.Serializable {
 				state.nameThread();
 				state.job = job;
 				state.seed = seed;
-				System.err.println("Job: " + state.job() + " Seed: "
+				if(out) System.err.println("Job: " + state.job() + " Seed: "
 						+ state.seed());
-				System.err.println("Starting " + state.getClass().getName());
+				if(out) System.err.println("Starting " + state.getClass().getName());
 				state.start();
 			}
 
@@ -643,7 +645,7 @@ public class SimState implements java.io.Serializable {
 				}
 				if (time > 0 && steps % time == 0) {
 					clock = System.currentTimeMillis();
-					System.err.println("Steps: "
+					if(out) System.err.println("Steps: "
 							+ steps
 							+ " Time: "
 							+ state.schedule.getTimestamp("At Start", "Done")
@@ -672,6 +674,7 @@ public class SimState implements java.io.Serializable {
 
 			state.finish();
 
+			if(out) 
 			if (retval)
 				System.err.println("Exhausted");
 			else

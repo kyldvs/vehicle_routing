@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import sim.app.ordering.Ordering;
+import sim.app.ordering.RandomOrdering;
+import sim.app.ordering.SAOrdering;
 import sim.app.packing.Bin;
 import sim.app.packing.FirstFit;
 import sim.app.packing.Packing;
@@ -37,7 +40,7 @@ public class VehicleRouting extends SimState
 	public static final int SOURCE_AREA = 2;
 	public static final int DESTINATION_AREA = 3;
 	
-	public static final int NUM_JOBS = 1000;
+	public static final int NUM_JOBS = 200;
 	
 	// SimState variables
 	public final IntGrid2D sourceGrid = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, EMPTY_AREA);
@@ -56,16 +59,26 @@ public class VehicleRouting extends SimState
 	// Changes to algorithm
 	private final PackingAlgorithm<Job> scheduler;
 	private final Topology topology;
+	private final Ordering ordering;
+	
 	private final Statistics stats;
 	
 	public VehicleRouting(long seed)
 	{ 
 		super(seed);
 		this.scheduler = new FirstFit<Job>();
-		this.topology = Topos.four();
+		this.topology = Topos.one();
+		this.ordering = new SAOrdering();
+	
 		this.stats = new Statistics();
 	}
 	
+	@Override
+	public void kill() {
+		System.out.printf("%d\t%d\t%d\n", stats.getJobsCompleted(), stats.getSteps(), stats.getStuck());
+		super.kill();
+	}
+
 	public void start()
 	{
 		super.start();
@@ -80,16 +93,11 @@ public class VehicleRouting extends SimState
 		initializeUnassignedJobs();
 
 		scheduleJobs();
+		ordering.order(assignments);
 	}
 	
-	@Override
-	public void kill() {
-		System.out.printf("%d jobs completed in %d steps.", stats.getJobsCompleted(), stats.getSteps());
-		super.kill();
-	}
 
 	private void scheduleJobs() {
-		System.out.println("Scheduling " + unassignedJobs.size());
 		// Schedule the jobs
 		Map<Job, Double> items = new HashMap<Job, Double>();
 		for (Job j : unassignedJobs) {
@@ -108,7 +116,6 @@ public class VehicleRouting extends SimState
 	
 	private void initializeUnassignedJobs()
 	{
-		System.out.println("Init " + NUM_JOBS);
 		for(int i = 0; i < NUM_JOBS; i++)
 		{
 			Source s = sources.get(random.nextInt(sources.size()));
@@ -162,13 +169,15 @@ public class VehicleRouting extends SimState
 		vehicles.add(v);
 	}
 	
-	public int getCollisions() {
-		return stats.getCollisions();
+	public int getStuck() {
+		return stats.getStuck();
 	}
 	
 	public static void main(String[] args)
 	{
+		for (int i = 0; i < 10; i++)
 		doLoop(new MakesSimState() {
+			@SuppressWarnings("rawtypes")
 			@Override
 			public Class simulationClass() {
 				return VehicleRouting.class;

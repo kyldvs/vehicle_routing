@@ -106,13 +106,14 @@ Vehicle routing has been a challenging problem since the advent of self driving 
 
 \section{Problem Statement}
 
-Given a topology and a list of packages, move the packages from their source to destination while minimizing the total duration. A topology is a 2-D grid containing sources, destinations, and vehicles. Vehicles are not allowed to collide with other vehicles, sources or destinations. Sources are black, destinations are red, and vehicles are red or blue circles depending on if they are currently carrying a package. The figures below represent two different topologies with the vehicles in the process of running their respective routes. \\
-
-\TODO{Use 2 different topologies here}
+Given a topology and a list of packages, move the packages from their source to destination while minimizing the total duration. A topology is a 2-D grid containing sources, destinations, and vehicles. Vehicles are not allowed to collide with other vehicles, sources or destinations. Sources are black, destinations are red, and vehicles are red or blue circles depending on if they are currently carrying a package. The figures below represent two different topologies with the vehicles in the process of running their respective routes.
 
 \begin{center}
 \includegraphics[height=200px]{topo_1.png} \ \ \ 
 \includegraphics[height=200px]{topo_2.png}
+\vspace{.1in}
+
+\textit{Topology 1 and 2}
 \end{center}
 
 The list of packages is given in a specific order and describes the source each package is originally located at, and the destination it must travel to. Usually there is a partial ordering that must be maintained when delivering packages, the packages must arrive in the order given as input to each destination. The problem has been relaxed to ignore the ordering restriction as well as allowing the vehicles to have infinite acceleration. This means that vehicles can accelerate to their maximum (unit) velocity and deccelerate to zero velocity instantaneously.
@@ -123,11 +124,21 @@ There were many aspects to this problem. Our initial research was focused on det
 
 \subsection{Topology}
 
-When desigining a toplogy there is a tradeoff beween space and speed. With more space vehicles have more room and avoiding collisions becomes easier allowing for the faster transporting of packages; however, space is expensive and can not be sacrificed without significant increases in performance. We tested four different topologies that were built with approximately the same space effeciency but the sources and destinations rearranged, number of vehicles was held constant throughout our testing.
+When desigining a toplogy there is a tradeoff beween space and speed. With more space vehicles have more room and avoiding collisions becomes easier allowing for the faster transporting of packages; however, space is expensive and can not be sacrificed without significant increases in performance. We tested four different topologies that were built with approximately the same space effeciency but the sources and destinations rearranged, number of vehicles was held constant throughout our testing. The first two topologies can be seen above; the remaining two are pictured below. 
 
-The first two topologies are pictures in Fig. 1; the remaining two are pictured below in Fig. 2. When holding other aspects of the problem constant there was a wide variance in performance when changing topologies. Fig. 3 contains statistics about the simulated performance of each topology. \\
+\begin{center}
+\includegraphics[height=200px]{topo_3.png} \ \ \ 
+\includegraphics[height=200px]{topo_4.png}
+\vspace{.1in}
 
-\TODO{Figures 2 and 3}
+\textit{Topology 3 and 4}
+\end{center}
+
+When holding other aspects of the problem constant there was a wide variance in performance when changing topologies. The table below contains statistics about the simulated performance of each topology.
+
+\begin{center}
+\includegraphics[height=250px]{topo_chart.png}
+\end{center}
 
 \subsection{Job Distribution}
 
@@ -135,9 +146,11 @@ A job does not have a specific vehicle it must be assigned to. Distributing the 
 
 In order to conform to our original problem some additional work is required. A binary search is performed to find the minimum, maximum capacity that does not require more than the predetermined number of robots. The packing using this maximum capacity is then given as the job distribution.
 
-A simple first-fit solution was used as the bin packing algorithm. It was compared against randomly assigning jobs to robots without attempting to acheive an even distribution. The resulting performance difference is presented in Fig. 4. \\
+A simple first-fit solution was used as the bin packing algorithm. It was compared against randomly assigning jobs to robots without attempting to acheive an even distribution. The resulting performance difference is presented below.
 
-\TODO{Figure 4}
+\begin{center}
+\includegraphics[height=250px]{distribution_chart.png}
+\end{center}
 
 \subsection{Job Ordering}
 
@@ -148,57 +161,39 @@ Once the jobs are fixed to a robot, the order in which each robot completes its 
 
 \item \textbf{Randomly pick a robot to optimize:} At random decide on a robot. For every pair of jobs assigned to the robot swap them, and if they increase the fitness function keep the change with a probability that increases to 1 over time.
 
-\item \textbf{Compute interesting points:} Each job is assigned an estimated weight based on the manhattan distance between source and destination. We will define interesting points to be the 3 points location at the start of the time interval, the middle of the time interval, and the end of the time interval. These points in time must be recomputed each time the fitness function updates the arrangement.
+\item \textbf{Compute interesting points:} We will define interesting points to be the 3 points location at the start of the time interval, the middle of the time interval, and the end of the time interval. These points in time must be recomputed each time the fitness function updates the arrangement.
 
 \item \textbf{Fitness function:} The fitness function can be computed by going through every pair of jobs $J_a, J_b$ with sources and destinations $S_a, D_a, S_b, D_b$, and summing over every interesting point in time relative to the start of the jobs, $t$. $\displaystyle \sum \text{distance}(P_{a, a}(t), P_{b, b}(t))^2$. Maximizing this fitness function will evenly distribute the paths.
 
 \item \textbf{Repeat and cool:} repeat starting at step 2 and cool down the annealing until a maximum is found.
 \end{enumerate}
 
-We compared this simulated annealing approach to randomly ordering the jobs within robots. The results comparing the two different strategies are below in Fig. 5. \\
+We compared this simulated annealing approach to randomly ordering the jobs within robots. The results comparing the two different strategies are below.
 
-\TODO{Figure 5}
+\begin{center}
+\includegraphics[height=250px]{ordering_chart.png}
+\end{center}
 
 \subsection{Vehicle Routes}
 
-To find vehicle routes a simple algorithm that performs a breadth first search (BFS) at every time step is used. For each robot, determine where it needs to move towards next, perform a BFS using the robot as a starting point. Move along the path if one exists, otherwise do nothing. This very simple algorithm treats robots as stationary objects for each time step, so if a robot is in an aisle blocked off by two other robots it will not move until the other robots are out of the way.
+To find vehicle routes a simple algorithm that performs a breadth first search (BFS) \cite{CLR} at every time step is used. For each robot, determine where it needs to move towards next, perform a BFS using the robot as a starting point. Move along the path if one exists, otherwise do nothing. This very simple algorithm treats robots as stationary objects for each time step, so if a robot is in an aisle blocked off by two other robots it will not move until the other robots are out of the way.
 
-We compared this algorithm to an optimal solution where robots were not considered obstacles. This allowed robots to always take the shortest path. The results can be found in Fig. 6.\\
+We compared this algorithm to an optimal solution where robots were not considered obstacles. This allowed robots to always take the shortest path. The results can be found below.
 
-\TODO{Cite bfs, CLRS, or Knuth}
-
-\TODO{Figure 6}
-
-\section{Results}
-
-\TODO{Do this}
+\begin{center}
+\includegraphics[height=250px]{routing_chart.png}
+\end{center}
 
 \section{Conclusions}
 
-\TODO{Do this}
+After running many experiments two parts of the problem that were explored had a significant impact on the number of steps to deliver all packages. The most significant factor was the topology. Topologies 2 and 4 required many more steps than topologies 1 and 2. The construction of topologies 2 and 4 included two separate central delivery locations. This appeared to slow everything down compared to the topologies with one cental delivery location.
 
-\nocite{*}
+The different strategies of routing vehicles also led to significant variance in the number of steps required. When collisions between vehicles were ignored the optimal routing was achieved for the fixed distribution and ordering of jobs. Using BFS and treating vehicles as obstacles resulted in an average number of steps that were more than 1 standard deviation away from the optimal. There is a lot of room for improvement in how the routes are found.
+
+Distributing and ordering the jobs did not significantly impact the number of steps required. The solution strategies proposed for each part of the problem did not achieve results better than a randomized strategy. This could mean that our strategies are flawed, or these parts of the problem will not be a large contributing factor to the overall performance.
+
 \bibliographystyle{plain}
 \bibliography{bib}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%
-\vspace{.25in}
-\subsubsection*{Revisions}
-Specific revisions:
--First paragraph, second sentence: What applications?
--Second paragraph, first sentence: Why are you addressing this issue? What is the motivation? Why is it important? 
--Second paragraph, second sentence: Eliminate the word "obvious"
-
-General revisions:
-1) The abstract so far needs to flow better. These two paragraphs are essentially an introduction/motivation, which can be concisely condensed into one paragraph. Clearly state the objective of the research, the motivation, and rationale. 
-2) What are your results??? How did you address the problem. What were your solutions? There is no mention of this. You need to also discuss the results and draw appropriate conclusions.
-3) What do these topologies mean? You presented this figure without any explanation. If this figure is representative of your results then keep it, but you need to at least state what it is and show that it pertinent evidence to the research objective.
-
-Can you make these changes and send them to me by Friday? Note: please use Microsoft Word documents; it will be easier for both of us to edit and revise. 
-
-Any questions or concerns, let me know.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
 

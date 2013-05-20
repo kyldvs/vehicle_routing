@@ -74,7 +74,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 						collision);
 				if (path == null) {
 					collision = true;
-					stats.collision();
+					stats.stuck();
 					path = vr.findPath(loc.toPoint(), dest.adjacentFunction(),
 							collision);
 				}
@@ -95,7 +95,7 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 						collision);
 				if (path == null) {
 					collision = true;
-					stats.collision();
+					stats.stuck();
 					path = vr.findPath(loc.toPoint(), src.adjacentFunction(),
 							collision);
 				}

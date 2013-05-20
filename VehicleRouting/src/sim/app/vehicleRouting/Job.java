@@ -16,7 +16,7 @@ public class Job implements Comparable<Job> {
 	{
 			this.setSource(source);
 			this.setDestination(destination);
-			this.setWeight(Utils.manhattanDistance(source.point, destination.point));
+			this.setWeight(Utils.manhattanDistance(source.getCenter(), destination.getCenter()));
 	}
 	
 	public Source getSource() {
