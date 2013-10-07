@@ -20,5 +20,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libraries/guava-14.0.1.jar"/>
+	<classpathentry kind="lib" path="libraries/j3d/j3dcore.jar"/>
+	<classpathentry kind="lib" path="libraries/j3d/j3dutils.jar"/>
+	<classpathentry kind="lib" path="libraries/j3d/vecmath.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

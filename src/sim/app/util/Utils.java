@@ -5,7 +5,7 @@ import java.awt.Point;
 import sim.util.Int2D;
 
 public class Utils {
-
+	
 	public static int manhattanDistance(Point a, Point b) {
 		return manhattanDistance(a.x, a.y, b.x, b.y);
 	}
