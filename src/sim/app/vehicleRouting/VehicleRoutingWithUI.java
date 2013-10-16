@@ -65,9 +65,9 @@ public class VehicleRoutingWithUI extends GUIState{
 	    controller.registerFrame(displayFrame);
 	    displayFrame.setVisible(true);
 	    
+	    display.attach(obstaclePortrayal,"Obstacles");
 	    display.attach(sourcePortrayal,"Source Locations");
 	    display.attach(destinationPortrayal,"Destination Locations");
-	    display.attach(obstaclePortrayal,"Obstacles");
 	    display.attach(vehiclePortrayal,"Vehicles");
 	    
 	    display.setBackdrop(Color.white);
