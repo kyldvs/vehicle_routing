@@ -27,7 +27,7 @@ public class VehicleRoutingWithUI extends GUIState{
     public void setupPortrayals()
     {
         VehicleRouting vr = (VehicleRouting)state;
-
+        
         sourcePortrayal.setField(vr.sourceGrid);
         destinationPortrayal.setField(vr.destinationGrid);
         obstaclePortrayal.setField(vr.obstacleGrid);
