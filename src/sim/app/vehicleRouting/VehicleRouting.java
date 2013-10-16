@@ -69,7 +69,7 @@ public class VehicleRouting extends SimState
 		this.scheduler = new FirstFit<Job>();
 		this.topology = Topos.one();
 		this.ordering = new SAOrdering();
-	
+		
 		this.stats = new Statistics();
 	}
 	
@@ -136,7 +136,6 @@ public class VehicleRouting extends SimState
 				for( int y = d.getyMin() ; y <= d.getyMax() ; y++ )
 				{
 					destinationGrid.field[x][y] = DESTINATION_AREA;
-//					obstacleGrid.field[x][y] = OBSTACLE_AREA;
 				}
 			}
 		}
