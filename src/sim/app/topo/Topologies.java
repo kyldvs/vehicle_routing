@@ -5,11 +5,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.media.j3d.NioImageBuffer.ImageType;
-
-import sim.app.vehicleRouting.Destination;
-import sim.app.vehicleRouting.Source;
-import sim.app.vehicleRouting.VehicleRouting;
 
 public class Topologies {
 	
@@ -35,7 +30,7 @@ public class Topologies {
 		
 		// put down sources
 		for (int i = 9; i <= w - 9; i += 2) {
-			for (int j = 30; j < h; j++) {
+			for (int j = 30; j < h - 10; j++) {
 				image.setRGB(i, j, 0x00FF00);
 			}
 		}
