@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import sim.app.packing.FirstFit;
 import sim.app.packing.PackingAlgorithm;
 import sim.app.topo.Topology;
-import sim.app.topo.Topos;
+import sim.app.topo.Topologies;
 import sim.display.Controller;
 import sim.display.Display2D;
 import sim.display.GUIState;

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import sim.app.ordering.Ordering;
-import sim.app.ordering.RandomOrdering;
 import sim.app.ordering.SAOrdering;
 import sim.app.packing.Bin;
 import sim.app.packing.FirstFit;
@@ -16,8 +15,8 @@ import sim.app.packing.Packing;
 import sim.app.packing.PackingAlgorithm;
 import sim.app.packing.PackingAlgorithms;
 import sim.app.stats.Statistics;
+import sim.app.topo.Topologies;
 import sim.app.topo.Topology;
-import sim.app.topo.Topos;
 import sim.engine.MakesSimState;
 import sim.engine.Schedule;
 import sim.engine.SimState;
@@ -67,7 +66,7 @@ public class VehicleRouting extends SimState
 	{ 
 		super(seed);
 		this.scheduler = new FirstFit<Job>();
-		this.topology = Topos.one();
+		this.topology = Topologies.fromImage("topo1.png");
 		this.ordering = new SAOrdering();
 	
 		this.stats = new Statistics();
@@ -83,19 +82,15 @@ public class VehicleRouting extends SimState
 	{
 		super.start();
 
-		topology.sources(this);
-		topology.destinations(this);
-		topology.vehicles(this);
-		
-		fillSources();
-		fillDestinations();
+		initVehicles();
+		initSources();
+		initDestinations();
 		
 		initializeUnassignedJobs();
 
 		scheduleJobs();
 		ordering.order(assignments);
 	}
-	
 
 	private void scheduleJobs() {
 		// Schedule the jobs
@@ -128,7 +123,16 @@ public class VehicleRouting extends SimState
 		destinations.add(d);
 	}
 	
-	private void fillDestinations() {
+	private void initDestinations() {
+		boolean[][] isDestination = topology.getDestinations();
+		for (int i = 0; i < isDestination.length; i++) {
+			for (int j = 0; j < isDestination[0].length; j++) {
+				if (isDestination[i][j]) {
+					destinations.add(new Destination(i, i, j, j));
+				}
+			}
+		}
+		
 		for(Destination d : destinations)
 		{
 			for( int x = d.getxMin() ; x <= d.getxMax() ; x++ )
@@ -146,7 +150,16 @@ public class VehicleRouting extends SimState
 		sources.add(s);
 	}
 	
-	private void fillSources() {
+	private void initSources() {
+		boolean[][] isSource = topology.getSources();
+		for (int i = 0; i < isSource.length; i++) {
+			for (int j = 0; j < isSource[0].length; j++) {
+				if (isSource[i][j]) {
+					sources.add(new Source(i, i, j, j));
+				}
+			}
+		}
+		
 		for(Source s : sources)
 		{
 			for( int x = s.getxMin() ; x <= s.getxMax() ; x++ )
@@ -155,6 +168,17 @@ public class VehicleRouting extends SimState
 				{
 					sourceGrid.field[x][y] = SOURCE_AREA;
 					obstacleGrid.field[x][y] = OBSTACLE_AREA;
+				}
+			}
+		}
+	}
+	
+	private void initVehicles() {
+		boolean[][] isVehicle = topology.getVehicles();
+		for (int i = 0; i < isVehicle.length; i++) {
+			for (int j = 0; j < isVehicle[0].length; j++) {
+				if (isVehicle[i][j]) {
+					addVehicle(i, j);
 				}
 			}
 		}
