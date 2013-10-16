@@ -31,8 +31,8 @@ import com.google.common.base.Function;
 public class VehicleRouting extends SimState
 {
 	// Immutable
-	public static final int GRID_HEIGHT = 110;
-	public static final int GRID_WIDTH = 101;
+	public static final int GRID_HEIGHT = 100;
+	public static final int GRID_WIDTH = 100;
 	
 	public static final int EMPTY_AREA = 0;
 	public static final int OBSTACLE_AREA = 1;
@@ -82,6 +82,7 @@ public class VehicleRouting extends SimState
 	{
 		super.start();
 
+		initObstacles();
 		initVehicles();
 		initSources();
 		initDestinations();
@@ -117,6 +118,18 @@ public class VehicleRouting extends SimState
 			Destination d = destinations.get(random.nextInt(destinations.size()));
 			unassignedJobs.add(new Job(s, d));
 		}
+	}
+	
+	private void initObstacles() {
+		boolean[][] isObstacle = topology.getObstacles();
+		for (int i = 0; i < isObstacle.length; i++) {
+			for (int j = 0; j < isObstacle[0].length; j++) {
+				if (isObstacle[i][j]) {
+					obstacleGrid.field[i][j] = OBSTACLE_AREA;
+				}
+			}
+		}
+		
 	}
 	
 	public void addDestination(Destination d) {

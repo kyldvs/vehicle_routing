@@ -28,7 +28,7 @@ public class Topologies {
 		
 		// build columns
 		for (int i = 10; i <= w - 10; i += 2) {
-			for (int j = 30; j < h; j++) {
+			for (int j = 30; j < h - 10; j++) {
 				image.setRGB(i, j, 0xFFFFFF);
 			}
 		}
@@ -50,6 +50,13 @@ public class Topologies {
 		for (int j = 11; j < 29; j++) {
 			image.setRGB(5, j, 0xFFFFFF);
 			image.setRGB(w - 5, j, 0xFFFFFF);
+		}
+		
+		// build vertical highways
+		for (int i = 10; i <= w - 10; i += 5) {
+			for (int j = 11; j < 29; j++) {
+				image.setRGB(i, j, 0xFFFFFF);
+			}
 		}
 		
 		// put down destinations
@@ -80,7 +87,7 @@ public class Topologies {
 		final int[][] colors = new int[w][h];
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
-				colors[i][j] = image.getRGB(i, j);
+				colors[i][j] = image.getRGB(i, j) & 0xFFFFFF;
 			}
 		}
 		
