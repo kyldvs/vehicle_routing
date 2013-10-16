@@ -1,10 +1,10 @@
 package sim.app.vehicleRouting;
 
-import java.awt.Color;
+import java.awt.Color; 
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
-
 import sim.app.stats.Statistics;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -16,6 +16,9 @@ import sim.util.Int2D;
 @SuppressWarnings("serial")
 public class Vehicle extends OvalPortrayal2D implements Steppable {
 	
+	
+	public int priority;
+	
 	private static int counter = 0;
 	private final int uid = counter++;
 	
@@ -25,18 +28,16 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 	private int step = 0;
 
 	public boolean hasItem = false;
-	public boolean collision = false;
 	
 	private Destination dest;
 	private Source src;
 	private Job job;
 
-
 	private Color noItemColor = Color.blue;
 	private Color itemColor = Color.red;
 
-	public Vehicle() {
-		// Default Constructor
+	public Vehicle(int priority) {
+		this.priority = priority;
 	}
 	
 	@Override
@@ -70,47 +71,111 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 		} else {
 			if (hasItem) {
 				dest = job.getDestination();
-				path = vr.findPath(loc.toPoint(), dest.adjacentFunction(),
-						collision);
-				if (path == null) {
-					collision = true;
-					stats.stuck();
-					path = vr.findPath(loc.toPoint(), dest.adjacentFunction(),
-							collision);
+				path = vr.findPath(loc.toPoint(), dest.adjacentFunction());
+								
+//				System.out.println(path);
+				
+				if(path == null || path.size() == 0)
+				{
+					return;
 				}
-
-				if (path != null) {
-					vr.vehicleGrid.setObjectLocation(this,
-							new Int2D(path.get(0)));
+				
+				if(pushBack(path.get(0), path, state))
+				{
+					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
 					if (path.size() == 1) {
 						stats.deliver(this, job, path.get(0));
 						hasItem = false;
 						job = null;
-						collision = false;
 					}
+				}
+				else
+				{
+					this.priority = VehicleRouting.priorityCount++;
 				}
 			} else {
 				src = job.getSource();
-				path = vr.findPath(loc.toPoint(), src.adjacentFunction(),
-						collision);
-				if (path == null) {
-					collision = true;
-					stats.stuck();
-					path = vr.findPath(loc.toPoint(), src.adjacentFunction(),
-							collision);
+				path = vr.findPath(loc.toPoint(), src.adjacentFunction());
+				
+				if(path == null || path.size() == 0)
+				{
+					return;
 				}
-
-				if (path != null) {
-					vr.vehicleGrid.setObjectLocation(this,
-							new Int2D(path.get(0)));
+				
+//				System.out.println(path);
+				
+				if(pushBack(path.get(0), path, state))
+				{
+					vr.vehicleGrid.setObjectLocation(this, new Int2D(path.get(0)));
 					if (path.size() == 1) {
 						stats.pickup(this, job, path.get(0));
 						hasItem = true;
-						collision = false;
 					}
+				}
+				else
+				{
+					this.priority = VehicleRouting.priorityCount++;
 				}
 			}
 		}
+	}
+	
+	public boolean pushBack(Point currentPoint, List<Point> path, SimState state)
+	{
+		VehicleRouting vr = (VehicleRouting) state;
+		
+		if(vr.vehicleGrid.getObjectsAtLocation(currentPoint.x, currentPoint.y) == null)
+		{
+			return true;
+		}
+		
+		Vehicle currentVehicle = (Vehicle)vr.vehicleGrid.getObjectsAtLocation(currentPoint.x, currentPoint.y).get(0);
+		
+		if(currentVehicle.priority > this.priority)
+		{	
+			int loc = path.indexOf(currentPoint);
+			Point nextPoint = null;
+			if (loc != path.size()-1)
+			{
+				nextPoint = path.get(loc + 1);
+			}
+			else
+			{
+				// Try and choose what is not on a path...currently just chooses the first valid condition 
+				if(!path.contains(new Point(currentPoint.x + 1, currentPoint.y)) && vr.obstacleGrid.get(currentPoint.x + 1, currentPoint.y) == VehicleRouting.EMPTY_AREA)
+				{
+					nextPoint = new Point(currentPoint.x + 1, currentPoint.y);
+				}
+				else if(!path.contains(new Point(currentPoint.x - 1, currentPoint.y)) && vr.obstacleGrid.get(currentPoint.x - 1, currentPoint.y) == VehicleRouting.EMPTY_AREA)
+				{
+					nextPoint = new Point(currentPoint.x - 1, currentPoint.y);
+				}
+				else if(!path.contains(new Point(currentPoint.x, currentPoint.y + 1)) && vr.obstacleGrid.get(currentPoint.x, currentPoint.y + 1) == VehicleRouting.EMPTY_AREA)
+				{
+					nextPoint = new Point(currentPoint.x, currentPoint.y + 1);
+				}
+				else if(!path.contains(new Point(currentPoint.x, currentPoint.y - 1)) && vr.obstacleGrid.get(currentPoint.x, currentPoint.y - 1) == VehicleRouting.EMPTY_AREA)
+				{
+					nextPoint = new Point(currentPoint.x, currentPoint.y - 1);
+				}
+				else
+				{
+					return false;
+				}
+				
+				path = new ArrayList<Point>();
+				path.add(currentPoint);
+				path.add(nextPoint);
+			}
+			
+			
+			if(pushBack(nextPoint, path, state))
+			{
+				vr.vehicleGrid.setObjectLocation(currentVehicle, new Int2D(nextPoint));
+				return true;
+			}
+		}
+		return false;
 	}
 
 

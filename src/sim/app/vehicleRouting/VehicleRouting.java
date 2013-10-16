@@ -30,6 +30,8 @@ import com.google.common.base.Function;
 @SuppressWarnings("serial")
 public class VehicleRouting extends SimState
 {
+	public static int priorityCount = 0;
+	
 	// Immutable
 	public static final int GRID_HEIGHT = 100;
 	public static final int GRID_WIDTH = 100;
@@ -198,7 +200,7 @@ public class VehicleRouting extends SimState
 	}
 	
 	public void addVehicle(int x, int y) {
-		Vehicle v = new Vehicle();
+		Vehicle v = new Vehicle(VehicleRouting.priorityCount++);
 		vehicleGrid.setObjectLocation(v, x, y);
 		Stoppable stop = schedule.scheduleRepeating(Schedule.EPOCH, 0, v, 1);
 		v.setStoppable(stop);
@@ -229,20 +231,9 @@ public class VehicleRouting extends SimState
 		System.exit(0);
 	}
 
-	public List<Point> findPath(Point start, Function<Point, Boolean> goal, boolean considerVehicles)
+	public List<Point> findPath(Point start, Function<Point, Boolean> goal)
 	{
-//		if (!considerVehicles) {
-//			List<Point> ignore = bfsIgnoreVehicles(start, goal);
-//			Point p = ignore.get(0);
-//			boolean[][] vehicleArray = get2DVehicleArray();
-//			if (vehicleArray[p.x][p.y]) {
-//				return null;
-//			} else {
-//				return ignore;
-//			}
-//		} else {
-			return bfs(start, goal);
-//		}
+			return bfsIgnoreVehicles(start, goal);
 	}
 	
 	/**
@@ -257,9 +248,14 @@ public class VehicleRouting extends SimState
 		LinkedList<Node<Point>> q = new LinkedList<Node<Point>>();
 		q.add(new Node<Point>(start));
 
+//		System.out.println(start);
+		
 		while(!q.isEmpty()) {
+			
 			Node<Point> n = q.remove();
 			Point p = n.data;
+//			System.out.println("\t" + p);
+
 			if (p.x < 0 || p.x >= GRID_WIDTH ||
 				p.y < 0 || p.y >= GRID_HEIGHT || 
 				v[p.x][p.y] ||
@@ -267,7 +263,7 @@ public class VehicleRouting extends SimState
 				continue;
 			}
 			v[p.x][p.y] = true;
-			
+
 			if (goal.apply(p)) {
 				LinkedList<Point> path = new LinkedList<Point>();
 				while(n.parent != null) {
@@ -276,7 +272,7 @@ public class VehicleRouting extends SimState
 				}
 				return path;
 			}
-			
+
 			q.add(new Node<Point>(new Point(p.x + 1, p.y), n));
 			q.add(new Node<Point>(new Point(p.x - 1, p.y), n));
 			q.add(new Node<Point>(new Point(p.x, p.y + 1), n));
