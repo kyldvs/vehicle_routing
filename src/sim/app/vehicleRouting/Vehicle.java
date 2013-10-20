@@ -73,8 +73,6 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 				dest = job.getDestination();
 				path = vr.findPath(loc.toPoint(), dest.adjacentFunction());
 								
-//				System.out.println(path);
-				
 				if(path == null || path.size() == 0)
 				{
 					return;
@@ -101,8 +99,6 @@ public class Vehicle extends OvalPortrayal2D implements Steppable {
 				{
 					return;
 				}
-				
-//				System.out.println(path);
 				
 				if(pushBack(path.get(0), path, state))
 				{
